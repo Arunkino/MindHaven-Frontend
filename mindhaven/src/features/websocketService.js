@@ -14,24 +14,34 @@ let reconnectInterval = null;
 let dispatch = null;
 let currentUserId = null;
 
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 5;
+
 const connectWebSocket = () => {
-  const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
+  const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
     console.log('WebSocket connected');
+    reconnectAttempts = 0;
     if (reconnectInterval) {
       clearInterval(reconnectInterval);
       reconnectInterval = null;
     }
   };
 
-  socket.onclose = () => {
-    console.log('WebSocket disconnected');
-    reconnectInterval = setInterval(() => {
-      console.log('Attempting to reconnect WebSocket');
-      connectWebSocket();
-    }, 5000);
+  socket.onclose = (event) => {
+    console.log('WebSocket disconnected', event.code, event.reason);
+    if (reconnectAttempts < maxReconnectAttempts) {
+      reconnectInterval = setInterval(() => {
+        console.log('Attempting to reconnect WebSocket');
+        connectWebSocket();
+        reconnectAttempts++;
+      }, 5000);
+    } else {
+      console.log('Max reconnection attempts reached');
+      toast.error("Unable to connect to chat server. Please refresh the page.");
+    }
   };
 
   socket.onerror = (error) => {
