@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+.object-cover{
+    padding: 20px;
+}
+.image-carousel-div{
+    height: 400px;
+    width: 500px;
+}
+.service-card{
+    cursor: pointer;
+}
+.video-stream {
+    width: 320px;
+    height: 240px;
+    background-color: #f0f0f0;
+    margin: 10px;
+    border: 1px solid #ccc;
+  }
