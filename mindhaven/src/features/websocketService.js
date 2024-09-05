@@ -10,42 +10,46 @@ import {
 } from './videoCall/videoCallSlice';
 
 let socket = null;
-let reconnectInterval = null;
 let dispatch = null;
 let currentUserId = null;
-
 let reconnectAttempts = 0;
-const maxReconnectAttempts = 5;
+const MAX_RECONNECT_ATTEMPTS = 5;
 
 const connectWebSocket = () => {
+  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+    console.error('Max reconnection attempts reached. Please refresh the page.');
+    toast.error('Unable to connect. Please refresh the page.');
+    return;
+  }
+
   const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
     console.log('WebSocket connected');
     reconnectAttempts = 0;
-    if (reconnectInterval) {
-      clearInterval(reconnectInterval);
-      reconnectInterval = null;
-    }
   };
 
   socket.onclose = (event) => {
-    console.log('WebSocket disconnected', event.code, event.reason);
-    if (reconnectAttempts < maxReconnectAttempts) {
-      reconnectInterval = setInterval(() => {
-        console.log('Attempting to reconnect WebSocket');
-        connectWebSocket();
-        reconnectAttempts++;
-      }, 5000);
-    } else {
-      console.log('Max reconnection attempts reached');
-      toast.error("Unable to connect to chat server. Please refresh the page.");
+    console.log('WebSocket disconnected');
+    console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
+    if (!event.wasClean) {
+      reconnectAttempts++;
+      console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+      setTimeout(connectWebSocket, 50000);
     }
   };
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
+    if (error instanceof Event) {
+      console.error('Error type:', error.type);
+    }
+    // If error has a message property, log it
+    if (error.message) {
+      console.error('Error message:', error.message);
+    }
+    toast.error('Connection error. Trying to reconnect...');
   };
 
   socket.onmessage = (event) => {
@@ -94,15 +98,9 @@ const handleVideoCallUpdate = (data) => {
   if (data.call_ended) {
     console.log('Call ended');
     dispatch(showCallSummary({ duration: data.call_duration }));
+    dispatch(resetCallState());
   }
 };
-const formatDuration = (seconds) => {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const remainingSeconds = seconds % 60;
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-};
-
 
 export const sendMessage = (messageData) => {
   if (socket && socket.readyState === WebSocket.OPEN) {
@@ -112,9 +110,7 @@ export const sendMessage = (messageData) => {
     console.error('WebSocket is not open. Unable to send message.');
     toast.error("Unable to send message. Please try again.");
     // Attempt to reconnect
-    if (!reconnectInterval) {
-      connectWebSocket();
-    }
+    connectWebSocket();
   }
 };
 
@@ -122,8 +118,9 @@ export const closeWebSocket = () => {
   if (socket) {
     socket.close();
   }
-  if (reconnectInterval) {
-    clearInterval(reconnectInterval);
-    reconnectInterval = null;
-  }
+  reconnectAttempts = 0;
+};
+
+export const isWebSocketConnected = () => {
+  return socket && socket.readyState === WebSocket.OPEN;
 };
