@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/user/userSlice';
 import { resetChatState } from '../features/user/chatSlice';
 import { fetchNotifications, markNotificationAsRead, clearAllNotifications } from '../features/notifications/notificationSlice';
-import { Bell } from 'lucide-react';
+import { Bell, Menu, X } from 'lucide-react';
 import logo from '../assets/logo.svg';
 import Notification from './Notification';
 
@@ -14,6 +14,7 @@ function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const notificationRef = useRef(null);
 
   useEffect(() => {
@@ -53,17 +54,29 @@ function Header() {
     <header className={`bg-${role === 'mentor' ? 'custom-mentor' : 'custom-bg'} text-white p-4 shadow-md`}>
       <nav className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold flex items-center">
-          <img src={logo} alt="Mind Haven Logo" className="h-10 w-auto mr-2 animate-pulse" />
+          <img src={logo} alt="Mind Haven Logo" className="h-8 w-auto mr-2 animate-pulse" />
+          <span className="hidden sm:inline">Mind Haven</span>
         </Link>
-        <ul className="flex space-x-6 items-center">
+        
+        {/* Mobile menu button */}
+        <button
+          className="sm:hidden text-white"
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+        >
+          {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Desktop menu */}
+        <ul className="hidden sm:flex space-x-6 items-center">
           {isAuthenticated && (
             <>
               <Link to='dashboard'>
-                <li className="text-custom-text text-xl">
+                <li className="text-custom-text text-lg">
                   Hi, {currentUser.role === 'admin' ? 'Admin' : currentUser.first_name}
                 </li>
               </Link>
               <li className="relative" ref={notificationRef}>
+                {/* ... (keep existing notification button and dropdown) */}
                 <button
                   onClick={() => setShowNotifications(!showNotifications)}
                   className="hover:text-custom-accent transition-colors duration-300"
@@ -116,6 +129,36 @@ function Header() {
             </>
           )}
         </ul>
+
+        {/* Mobile menu */}
+        {showMobileMenu && (
+          <div className="absolute top-16 left-0 right-0 bg-custom-bg sm:hidden z-50">
+            <ul className="flex flex-col items-center py-4 space-y-4">
+              {isAuthenticated && (
+                <>
+                  <Link to='dashboard' onClick={() => setShowMobileMenu(false)}>
+                    <li className="text-custom-text text-lg">
+                      Hi, {currentUser.role === 'admin' ? 'Admin' : currentUser.first_name}
+                    </li>
+                  </Link>
+                  <li className="relative" ref={notificationRef} >
+                    {/* ... (add mobile-friendly notification button and dropdown) */}
+                    <button onClick={() => setShowMobileMenu(false)}>Bell</button>
+                  </li>
+                </>
+              )}
+              <li><Link to="" className="hover:text-custom-accent transition-colors duration-300">Home</Link></li>
+              {isAuthenticated ? (
+                <li><button onClick={handleLogout} className="hover:text-custom-accent transition-colors duration-300">Logout</button></li>
+              ) : (
+                <>
+                  <li><Link to="/login" className="hover:text-custom-accent transition-colors duration-300">Login</Link></li>
+                  <li><Link to="/signup" className="bg-white text-custom-bg px-4 py-2 rounded-full hover:bg-custom-accent hover:text-white transition-colors duration-300">Sign Up</Link></li>
+                </>
+              )}
+            </ul>
+          </div>
+        )}
       </nav>
     </header>
   );
