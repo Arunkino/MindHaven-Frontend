@@ -136,13 +136,14 @@ function Header() {
             <ul className="flex flex-col items-center py-4 space-y-4">
               {isAuthenticated && (
                 <>
-                  <Link to='dashboard'>
+                  <Link to='dashboard' onClick={() => setShowMobileMenu(false)}>
                     <li className="text-custom-text text-lg">
                       Hi, {currentUser.role === 'admin' ? 'Admin' : currentUser.first_name}
                     </li>
                   </Link>
-                  <li className="relative" ref={notificationRef}>
+                  <li className="relative" ref={notificationRef} >
                     {/* ... (add mobile-friendly notification button and dropdown) */}
+                    <button onClick={() => setShowMobileMenu(false)}>Bell</button>
                   </li>
                 </>
               )}

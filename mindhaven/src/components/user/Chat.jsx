@@ -48,7 +48,7 @@ const Chat = () => {
           receiver: currentChat.id,
         }
       };
-      
+      console.log("Sending message:", messageData);
       sendMessage(messageData);
       setMessage('');
     }
