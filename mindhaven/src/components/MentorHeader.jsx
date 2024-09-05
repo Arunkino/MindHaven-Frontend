@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../features/user/userSlice';
 import { resetChatState } from '../features/user/chatSlice';
 import { fetchNotifications, markNotificationAsRead, clearAllNotifications } from '../features/notifications/notificationSlice';
-import { Bell } from 'lucide-react';
+import { Bell, Menu, X } from 'lucide-react';
 import logo from '../assets/logo.svg';
 import Notification from './Notification';
 
@@ -14,7 +14,9 @@ function Header() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const notificationRef = useRef(null);
+  const mobileMenuRef = useRef(null);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -26,6 +28,9 @@ function Header() {
     const handleClickOutside = (event) => {
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
+      }
+      if (mobileMenuRef.current && !mobileMenuRef.current.contains(event.target)) {
+        setShowMobileMenu(false);
       }
     };
 
@@ -55,8 +60,18 @@ function Header() {
         <Link to="/" className="text-2xl font-bold flex items-center">
           <img src={logo} alt="Mind Haven Logo" className="h-10 w-auto mr-2 animate-pulse" />
         </Link>
-        <ul className="flex space-x-6 items-center">
-          <li className="text-custom-text text-xl">Mentor</li>
+        
+        {/* Mobile menu button */}
+        <button
+          className="sm:hidden text-black"
+          onClick={() => setShowMobileMenu(!showMobileMenu)}
+        >
+          {showMobileMenu ? <X size={24} /> : <Menu size={24} />}
+        </button>
+
+        {/* Desktop menu */}
+        <ul className="hidden sm:flex space-x-6 items-center">
+          {/* <li className="text-custom-text text-xl">Mentor</li> */}
           {isAuthenticated && (
             <>
               <Link to='dashboard/'>
@@ -115,6 +130,32 @@ function Header() {
             </>
           )}
         </ul>
+
+        {/* Mobile menu */}
+        {showMobileMenu && (
+          <div ref={mobileMenuRef} className="absolute top-16 left-0 right-0 bg-gray sm:hidden z-50">
+            <ul className="flex flex-col items-center py-4 space-y-4">
+              {/* <li className="text-custom-text text-xl">Mentor</li> */}
+              {isAuthenticated && (
+                <>
+                  <Link to='dashboard/' onClick={() => setShowMobileMenu(false)}>
+                    <li className="text-custom-text text-xl">Hi, {currentUser.first_name}</li>
+                  </Link>
+                  {/* Add mobile-friendly notification button here if needed */}
+                </>
+              )}
+              <li><Link to="/mentor" onClick={() => setShowMobileMenu(false)} className="hover:text-custom-accent transition-colors duration-300">Home</Link></li>
+              {isAuthenticated ? (
+                <li><button onClick={() => { handleLogout(); setShowMobileMenu(false); }} className="hover:text-custom-accent transition-colors duration-300">Logout</button></li>
+              ) : (
+                <>
+                  <li><Link to="/login" onClick={() => setShowMobileMenu(false)} className="hover:text-custom-accent transition-colors duration-300">Login</Link></li>
+                  <li><Link to="/mentor/signup" onClick={() => setShowMobileMenu(false)} className="bg-white text-custom-bg px-4 py-2 rounded-full hover:bg-custom-accent hover:text-white transition-colors duration-300">Become a Mentor</Link></li>
+                </>
+              )}
+            </ul>
+          </div>
+        )}
       </nav>
     </header>
   );

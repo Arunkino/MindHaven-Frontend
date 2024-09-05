@@ -1,7 +1,9 @@
 import axios from 'axios';
 
+
+//const BASEURL = import.meta.env.REACT_APP_API_BASE_URL
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.REACT_APP_API_BASE_URL,
+  baseURL: 'http://api.mindhaven.site',
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
