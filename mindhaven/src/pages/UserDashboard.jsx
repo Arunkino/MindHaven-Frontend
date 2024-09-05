@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Wallet, Clock, MessagesSquare, LogOut, Settings , Calendar, HeartPulse} from 'lucide-react';
+import { User, Wallet, Clock, MessagesSquare, LogOut, Settings, Calendar, HeartPulse } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../features/user/userSlice';
@@ -9,12 +9,12 @@ import Chat from '../components/user/Chat';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { resetChatState } from '../features/user/chatSlice';
 
-
 const UserDashboard = () => {
   const [activeSection, setActiveSection] = useState('profile');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-//handling logout from navbar
+
   const handleLogout = (e) => {
     e.preventDefault();
     console.log("logout");
@@ -34,6 +34,7 @@ const UserDashboard = () => {
       } else {
         e.preventDefault();
         setActiveSection(section);
+        setSidebarOpen(false);
       }
     };
 
@@ -73,9 +74,17 @@ const UserDashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex flex-col h-screen bg-gray-100 md:flex-row">
+      {/* Mobile menu button */}
+      <button
+        className="md:hidden p-4 focus:outline-none"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        Menu
+      </button>
+
       {/* Sidebar */}
-      <div className="w-64 bg-white shadow-md">
+      <div className={`w-full md:w-64 bg-white shadow-md ${sidebarOpen ? 'block' : 'hidden'} md:block`}>
         <div className="p-4">
           {/* <h2 className="text-2xl font-semibold text-gray-800">MindHaven</h2> */}
         </div>
@@ -91,11 +100,9 @@ const UserDashboard = () => {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-8">
-          <h1 className="text-3xl font-semibold text-gray-600 mb-8">Welcome to MindHaven</h1>
-          {renderContent()}
-        </div>
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+        <h1 className="text-2xl md:text-3xl font-semibold text-gray-600 mb-4 md:mb-8">Welcome to MindHaven</h1>
+        {renderContent()}
       </div>
     </div>
   );
