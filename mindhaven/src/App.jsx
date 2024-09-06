@@ -20,8 +20,14 @@ function App() {
   const MAX_RECONNECT_ATTEMPTS = 5;
 
   useEffect(() => {
+  console.log("All env variables:", import.meta.env);
+  console.log("Agora App ID:", import.meta.env.VITE_AGORA_APP_ID);
+}, []);
+  
+  useEffect(() => {
     setupAxiosInterceptors();
   }, []);
+  
 
   useEffect(() => {
     let socket = null;
