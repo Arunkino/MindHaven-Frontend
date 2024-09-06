@@ -32,6 +32,12 @@ const VideoCall = () => {
 
   const [paymentData, setPaymentData] = useState(null);
 
+
+  //for debugging only
+useEffect(() => {
+  console.log("Agora App ID:", import.meta.env.VITE_AGORA_APP_ID);
+  // ... rest of your useEffect
+}, []);
   const initiatePayment = async () => {
     try {
       const response = await axiosInstance.post(`/api/create-payment/${callId}/`);
