@@ -66,7 +66,8 @@ const connectWebSocket = () => {
     } else if (data.type === 'video_call_update') {
       console.log('Received video call update:', data.data);
       handleVideoCallUpdate(data.data);
-    }
+    } else if (data.type === 'video_call_event') {
+      console.log('Received video call event:', data.data);
   };
 };
 
