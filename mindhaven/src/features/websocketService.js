@@ -27,8 +27,8 @@ const connectWebSocket = () => {
     toast.error('Unable to connect. Please refresh the page.');
     return;
   }
-
-  const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
+  const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
+  // const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
