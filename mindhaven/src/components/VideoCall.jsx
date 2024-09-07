@@ -29,86 +29,9 @@ const VideoCall = () => {
   const {currentUser} = useSelector((state) => state.user);
   const [token, setToken] = useState(null);
   const [showEndCallConfirmation, setShowEndCallConfirmation] = useState(false);
+
   const [paymentData, setPaymentData] = useState(null);
 
-  useEffect(() => {
-    console.log("VideoCall component state:", { 
-      isCallActive, 
-      callDuration, 
-      participantJoined, 
-      showSummary, 
-      finalCallDuration 
-    });
-  }, [isCallActive, callDuration, participantJoined, showSummary, finalCallDuration]);
-
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const response = await axiosInstance.get(`/api/appointments/${callId}/token/`);
-        setToken(response.data.token);
-      } catch (error) {
-        console.error('Error fetching token:', error);
-        toast.error("Failed to fetch token. Please try again.");
-      }
-    };
-    fetchToken();
-
-    const socket = setupWebSocket(dispatch, currentUser.id);
-    
-    setTimeout(() => {
-      sendMessage({
-        type: 'video_call_event',
-        data: {
-          event_type: 'user_joined',
-          appointment_id: callId,
-          user_role: currentUser.role,
-        },
-      });
-    }, 1000);
-
-    return () => {
-      closeWebSocket();
-    };
-  }, [callId, currentUser, dispatch]);
-
-  useEffect(() => {
-    let interval;
-    if (isCallActive) {
-      interval = setInterval(() => {
-        dispatch(updateCallDuration());
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isCallActive, dispatch]);
-
-  const handleCallEnd = useCallback(() => {
-    console.log("Call end initiated");
-    setShowEndCallConfirmation(true);
-  }, []);
-
-  const confirmEndCall = useCallback(() => {
-    console.log("Confirming call end");
-    sendMessage({
-      type: 'video_call_event',
-      data: {
-        event_type: 'call_ended',
-        appointment_id: callId,
-        call_duration: callDuration,
-        user_role: currentUser.role,
-      },
-    });
-    setShowEndCallConfirmation(false);
-    dispatch(showCallSummary({ duration: callDuration }));
-  }, [callId, callDuration, currentUser.role, dispatch]);
-
-  const goToDashboard = useCallback(() => {
-    console.log("Navigating to dashboard");
-    dispatch(resetCallState());
-    const redirectPath = currentUser.role === 'mentor' ? '/mentor/dashboard' : '/dashboard';
-    navigate(redirectPath);
-    window.location.reload();
-  }, [dispatch, navigate, currentUser.role]);
-  
   const initiatePayment = async () => {
     try {
       const response = await axiosInstance.post(`/api/create-payment/${callId}/`);
@@ -165,10 +88,106 @@ const VideoCall = () => {
   };
 
 
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await axiosInstance.get(`/api/appointments/${callId}/token/`);
+        setToken(response.data.token);
+      } catch (error) {
+        console.error('Error fetching token:', error);
+        toast.error("Failed to fetch token. Please try again.");
+      }
+    };
+    fetchToken();
+
+    const socket = setupWebSocket(dispatch, currentUser.id);
+    
+    setTimeout(() => {
+      sendMessage({
+        type: 'video_call_event',
+        data: {
+          event_type: 'user_joined',
+          appointment_id: callId,
+          user_role: currentUser.role,
+        },
+      });
+    }, 1000);
+
+    return () => {
+      closeWebSocket();
+    };
+  }, [callId, currentUser, dispatch]);
+
+  useEffect(() => {
+    let interval;
+    if (isCallActive) {
+      interval = setInterval(() => {
+        dispatch(updateCallDuration());
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isCallActive, dispatch]);
+
+
+  useEffect(() => {
+    if (showSummary) {
+      // Stop the AgoraUIKit or perform any necessary cleanup
+      // You might need to call a function from AgoraUIKit to properly end the call
+      // For example: AgoraUIKit.leave() (check the AgoraUIKit documentation for the correct method)
+      
+      // Show the call summary modal
+      setShowEndCallConfirmation(false);
+    }
+  }, [showSummary]);
+
+  // useEffect(() => {
+  //   const handleCallEnd = (action) => {
+  //     if (action.type === 'SHOW_CALL_SUMMARY') {
+  //       console.log('Showing call summary:', action.payload);
+  //       setFinalCallDuration(action.payload.duration);
+  //       setShowCallSummary(true);
+  //     }
+  //   };
+
+  //   dispatch(handleCallEnd);
+
+  //   return () => {
+  //     // Clean up the dispatch subscription
+  //     dispatch({ type: 'REMOVE_CALL_END_HANDLER' });
+  //   };
+  // }, [dispatch]);
+
+  const handleCallEnd = useCallback(() => {
+    setShowEndCallConfirmation(true);
+  }, []);
+
+  const confirmEndCall = useCallback(() => {
+    sendMessage({
+      type: 'video_call_event',
+      data: {
+        event_type: 'call_ended',
+        appointment_id: callId,
+        call_duration: callDuration,
+        user_role: currentUser.role,
+      },
+    });
+    setShowEndCallConfirmation(false);
+    dispatch(showCallSummary({ duration: callDuration }));
+  }, [callId, callDuration, currentUser.role, dispatch]);
+
+  const goToDashboard = useCallback(() => {
+    dispatch(resetCallState());
+    const redirectPath = currentUser.role === 'mentor' ? '/mentor/dashboard' : '/dashboard';
+    navigate(redirectPath);
+    window.location.reload();
+  }, [dispatch, navigate, currentUser.role]);
+
+
+
   const proceedToPayment = useCallback(() => {
     console.log("Proceeding to payment...");
     initiatePayment();
-  }, []);
+  }, [goToDashboard]);
 
   const callbacks = {
     EndCall: handleCallEnd,
