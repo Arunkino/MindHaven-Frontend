@@ -34,6 +34,7 @@ const videoCallSlice = createSlice({
       state.isCallActive = false;
       state.showCallSummary = true;
       state.finalCallDuration = action.payload.duration;
+      state.participantJoined = false;
     },
     resetCallState: (state) => {
       return initialState;
