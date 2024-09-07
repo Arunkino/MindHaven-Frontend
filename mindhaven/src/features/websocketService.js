@@ -14,42 +14,44 @@ let dispatch = null;
 let currentUserId = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
+const RECONNECT_INTERVAL = 5000; // 5 seconds
 
 const connectWebSocket = () => {
+  if (!currentUserId) {
+    console.log('No user ID available. Skipping WebSocket connection.');
+    return;
+  }
+
   if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
     console.error('Max reconnection attempts reached. Please refresh the page.');
     toast.error('Unable to connect. Please refresh the page.');
     return;
   }
 
-  const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
+  const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
     console.log('WebSocket connected');
     reconnectAttempts = 0;
+    toast.success('Connected to chat server');
   };
 
   socket.onclose = (event) => {
     console.log('WebSocket disconnected');
     console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
-    if (!event.wasClean) {
+    if (!event.wasClean && currentUserId) {
       reconnectAttempts++;
       console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-      setTimeout(connectWebSocket, 50000);
+      setTimeout(connectWebSocket, RECONNECT_INTERVAL);
     }
   };
 
   socket.onerror = (error) => {
     console.error('WebSocket error:', error);
-    if (error instanceof Event) {
-      console.error('Error type:', error.type);
+    if (currentUserId) {
+      toast.error('Connection error. Trying to reconnect...');
     }
-    // If error has a message property, log it
-    if (error.message) {
-      console.error('Error message:', error.message);
-    }
-    toast.error('Connection error. Trying to reconnect...');
   };
 
   socket.onmessage = (event) => {
@@ -66,8 +68,6 @@ const connectWebSocket = () => {
     } else if (data.type === 'video_call_update') {
       console.log('Received video call update:', data.data);
       handleVideoCallUpdate(data.data);
-    } else if (data.type === 'video_call_event') {
-      console.log('Received video call event:', data.data);
     }
   };
 };
@@ -75,9 +75,12 @@ const connectWebSocket = () => {
 export const setupWebSocket = (dispatchFunction, userId) => {
   dispatch = dispatchFunction;
   currentUserId = userId;
-  connectWebSocket();
+  if (userId) {
+    connectWebSocket();
+  }
   return socket;
 };
+
 
 const handleVideoCallUpdate = (data) => {
   console.log('Handling video call update:', data);
@@ -100,7 +103,8 @@ const handleVideoCallUpdate = (data) => {
   if (data.call_ended) {
     console.log('Call ended');
     dispatch(showCallSummary({ duration: data.call_duration }));
-    dispatch(resetCallState());
+    dispatch(setCallActive(false));
+    dispatch(setParticipantJoined(false));
   }
 };
 
@@ -123,6 +127,25 @@ export const closeWebSocket = () => {
   reconnectAttempts = 0;
 };
 
+
+
+
 export const isWebSocketConnected = () => {
   return socket && socket.readyState === WebSocket.OPEN;
+};
+
+export const reconnectWebSocket = () => {
+  if (socket) {
+    socket.close();
+  }
+  reconnectAttempts = 0;
+  connectWebSocket();
+};
+
+export const disconnectWebSocket = () => {
+  if (socket) {
+    socket.close();
+  }
+  currentUserId = null;
+  reconnectAttempts = 0;
 };
