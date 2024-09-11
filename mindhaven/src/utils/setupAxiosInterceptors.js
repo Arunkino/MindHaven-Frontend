@@ -26,8 +26,9 @@ export const setupAxiosInterceptors = () => {
       const refreshTokenValue = state.user.refreshToken;
 
       if (error.response && error.response.status === 401) {
+        
         // Check if this request is a retry attempt and also if it's not the refresh token request itself
-        if (originalRequest._retry || originalRequest.url.includes('/api/token/refresh/')) {
+        if (originalRequest._retry || originalRequest.url.includes('/api/token/refresh/' || originalRequest.url.includes('/login/'))) {
           // If it's a retry or a refresh token request itself, then logout
           await store.dispatch(logout());
           // Redirect to login page or show a login modal
@@ -40,6 +41,9 @@ export const setupAxiosInterceptors = () => {
 
         try {
           console.log("Attempting to refresh token...");
+          console.log("Attempting to refresh token...");
+          console.log("Attempting to refresh token...");
+          console.log("original request url:",originalRequest.url);
           const response = await axiosInstance.post('/api/token/refresh/', { refresh: refreshTokenValue });
           console.log("Token refresh response:", response.data);
           const { access, refresh } = response.data;

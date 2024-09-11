@@ -1,79 +1,62 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { PersistGate } from 'redux-persist/integration/react';
 import MainRoutes from './routes/MainRoutes';
 import MentorRoutes from './routes/MentorRoutes';
 import AdminRoutes from './routes/AdminRoutes';
 import { setupAxiosInterceptors } from './utils/setupAxiosInterceptors';
-import { closeWebSocket, setupWebSocket } from './features/websocketService';
+import { setupWebSocket, disconnectWebSocket, isWebSocketConnected, reconnectWebSocket } from './features/websocketService';
 import VideoCallWrapper from './components/VideoCall';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
-import { persistor } from './app/store';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.user.currentUser);
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
-  const [reconnectAttempts, setReconnectAttempts] = useState(0);
-  const MAX_RECONNECT_ATTEMPTS = 5;
+
+  const connectWebSocket = useCallback(() => {
+    if (isAuthenticated && currentUser && currentUser.id) {
+      setupWebSocket(dispatch, currentUser.id);
+    }
+  }, [dispatch, currentUser, isAuthenticated]);
 
   useEffect(() => {
     setupAxiosInterceptors();
   }, []);
 
   useEffect(() => {
-    let socket = null;
-    let reconnectTimeout = null;
-
-    const connectWebSocket = () => {
-      if (isAuthenticated && currentUser && currentUser.id) {
-        socket = setupWebSocket(dispatch, currentUser.id);
-        
-        socket.onclose = (event) => {
-          console.log('WebSocket closed. Attempting to reconnect...');
-          if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
-            reconnectTimeout = setTimeout(() => {
-              setReconnectAttempts(prev => prev + 1);
-              connectWebSocket();
-            }, 5000); // Wait 5 seconds before attempting to reconnect
-          } else {
-            toast.error('Unable to establish WebSocket connection. Please refresh the page.');
-          }
-        };
-
-        socket.onerror = (error) => {
-          console.error('WebSocket error:', error);
-          toast.error('WebSocket error occurred. Please check your connection.');
-        };
-      }
-    };
-
-    connectWebSocket();
+    if (isAuthenticated && currentUser) {
+      connectWebSocket();
+    } else {
+      disconnectWebSocket();
+    }
 
     return () => {
-      if (socket) {
-        closeWebSocket();
-      }
-      if (reconnectTimeout) {
-        clearTimeout(reconnectTimeout);
-      }
+      disconnectWebSocket();
     };
-  }, [dispatch, currentUser, isAuthenticated, reconnectAttempts]);
+  }, [isAuthenticated, currentUser, connectWebSocket]);
+
+  useEffect(() => {
+    const checkConnection = setInterval(() => {
+      if (isAuthenticated && currentUser && !isWebSocketConnected()) {
+        reconnectWebSocket();
+      }
+    }, 10000); // Check every 10 seconds
+
+    return () => clearInterval(checkConnection);
+  }, [isAuthenticated, currentUser]);
 
   return (
-    <PersistGate loading={null} persistor={persistor}>
-      <Router>
-        <ToastContainer />
-        <Routes>
-          <Route path="/*" element={<MainRoutes />} />
-          <Route path="/mentor/*" element={<MentorRoutes />} />
-          <Route path="/admin/*" element={<AdminRoutes />} />
-          <Route path="/video-call/:callId" element={<VideoCallWrapper />} />
-        </Routes>
-      </Router>
-    </PersistGate>
+    <Router>
+      <ToastContainer />
+      <Routes>
+        <Route path="/*" element={<MainRoutes />} />
+        <Route path="/mentor/*" element={<MentorRoutes />} />
+        <Route path="/admin/*" element={<AdminRoutes />} />
+        <Route path="/video-call/:callId" element={<VideoCallWrapper />} />
+      </Routes>
+    </Router>
   );
 }
 

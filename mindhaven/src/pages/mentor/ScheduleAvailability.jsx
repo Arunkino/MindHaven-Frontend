@@ -130,12 +130,16 @@ const checkExistingAvailability = (day, start, end) => {
   const handleSaveAvailability = async () => {
     try {
       const currentDate = new Date();
+      console.log("Current date and time:", currentDate);
+  
       const selectedDayIndex = daysOfWeek.indexOf(selectedDay);
-      
+      console.log("Selected day:", selectedDay, "Index:", selectedDayIndex);
+  
       // Calculate the next occurrence of the selected day
       let nextOccurrence = new Date(currentDate);
       nextOccurrence.setDate(currentDate.getDate() + (selectedDayIndex + 7 - currentDate.getDay()) % 7);
       nextOccurrence.setHours(0, 0, 0, 0);
+      console.log("Calculated next occurrence:", nextOccurrence);
   
       const data = {
         day_of_week: selectedDayIndex,
@@ -145,6 +149,7 @@ const checkExistingAvailability = (day, start, end) => {
         mentor: currentUser.mentor_id,
         current_date: currentDate.toISOString(),
       };
+      console.log("Data being sent to the server:", data);
   
       // Check for overlapping availabilities
       const overlappingAvailability = availabilities.find(a => 
@@ -155,17 +160,23 @@ const checkExistingAvailability = (day, start, end) => {
       );
   
       if (overlappingAvailability) {
+        console.log("Overlapping availability found:", overlappingAvailability);
         toast.warn('This availability overlaps with an existing one. Please choose a different time slot.');
         return;
       }
   
-      await axiosInstance.post('/api/availabilities/', data);
+      const response = await axiosInstance.post('/api/availabilities/', data);
+      console.log("Server response:", response.data);
+  
       toast.success('Availability saved successfully');
       fetchAvailabilities();
       fetchSlots();
       setIsCreating(false);
     } catch (error) {
       console.error('Error saving availability:', error);
+      if (error.response) {
+        console.error('Error response:', error.response.data);
+      }
       toast.error('Failed to save availability');
     }
   };

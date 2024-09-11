@@ -39,6 +39,7 @@ function Login() {
       
     } catch (error) {
       console.error('Error logging in:', error.response?.data || error.message);
+      console.log("Error Response", error)
       setError(error.response?.data?.detail || 'An error occurred during login. Please try again.');
       
     } finally {

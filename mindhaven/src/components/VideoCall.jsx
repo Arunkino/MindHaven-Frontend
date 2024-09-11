@@ -128,6 +128,18 @@ const VideoCall = () => {
     return () => clearInterval(interval);
   }, [isCallActive, dispatch]);
 
+
+  useEffect(() => {
+    if (showSummary) {
+      // Stop the AgoraUIKit or perform any necessary cleanup
+      // You might need to call a function from AgoraUIKit to properly end the call
+      // For example: AgoraUIKit.leave() (check the AgoraUIKit documentation for the correct method)
+      
+      // Show the call summary modal
+      setShowEndCallConfirmation(false);
+    }
+  }, [showSummary]);
+
   // useEffect(() => {
   //   const handleCallEnd = (action) => {
   //     if (action.type === 'SHOW_CALL_SUMMARY') {
