@@ -39,26 +39,30 @@ export const setupAxiosInterceptors = () => {
 
         originalRequest._retry = true;
 
-        try {
-          console.log("Attempting to refresh token...");
-          console.log("Attempting to refresh token...");
-          console.log("Attempting to refresh token...");
-          console.log("original request url:",originalRequest.url);
-          const response = await axiosInstance.post('/api/token/refresh/', { refresh: refreshTokenValue });
-          console.log("Token refresh response:", response.data);
-          const { access, refresh } = response.data;
-          await store.dispatch(refreshToken({ accessToken: access, refreshToken: refresh }));
-          originalRequest.headers['Authorization'] = `Bearer ${access}`;
-          return axiosInstance(originalRequest);
-        } catch (refreshError) {
-          console.error("Token refresh failed:", refreshError);
-          if (refreshError.response) {
-            console.log("Refresh error response:", refreshError.response.data);
+        if(!originalRequest.url.includes('/login/')){
+          try {
+            console.log("Attempting to refresh token..., original request url:",!originalRequest.url.includes('/login/'));
+            console.log("Attempting to refresh token...");
+            console.log("Attempting to refresh token...");
+            console.log("original request url:",originalRequest.url);
+            const response = await axiosInstance.post('/api/token/refresh/', { refresh: refreshTokenValue });
+            console.log("Token refresh response:", response.data);
+            const { access, refresh } = response.data;
+            await store.dispatch(refreshToken({ accessToken: access, refreshToken: refresh }));
+            originalRequest.headers['Authorization'] = `Bearer ${access}`;
+            return axiosInstance(originalRequest);
+          } catch (refreshError) {
+            console.error("Token refresh failed:", refreshError);
+            if (refreshError.response) {
+              console.log("Refresh error response:", refreshError.response.data);
+            }
+            console.log("Logging out due to invalid refresh token...");
+            await store.dispatch(logout());
+            return Promise.reject(refreshError);
           }
-          console.log("Logging out due to invalid refresh token...");
-          await store.dispatch(logout());
-          return Promise.reject(refreshError);
+          
         }
+        
       }
 
       // If it's any other error, reject the promise
