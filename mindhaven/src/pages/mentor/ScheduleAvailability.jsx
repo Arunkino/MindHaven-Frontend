@@ -253,21 +253,21 @@ const checkExistingAvailability = (day, start, end) => {
 
         {/* Day selection buttons */}
         <div className="grid grid-cols-7 gap-4 mb-8">
-          {daysOfWeek.map((day) => (
+          {daysOfWeek.map((day, index) => (
             <button
               key={day}
               onClick={() => handleDayClick(day)}
               className={`flex flex-col items-center py-4 px-2 rounded-lg transition-colors ${
                 selectedDay === day
                   ? 'bg-blue-500 text-white'
-                  : availabilities.some(a => a.day_of_week === daysOfWeek.indexOf(day))
+                  : availabilities.some(a => a.day_of_week === index)
                     ? 'bg-green-100 text-green-800 hover:bg-green-200'
                     : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
               }`}
             >
-              <Calendar className={`mb-2 ${availabilities.some(a => a.day_of_week === daysOfWeek.indexOf(day)) ? 'text-green-500' : ''}`} />
+              <Calendar className={`mb-2 ${availabilities.some(a => a.day_of_week === index) ? 'text-green-500' : ''}`} />
               <span className="text-sm">{day.slice(0, 3)}</span>
-              {availabilities.some(a => a.day_of_week === daysOfWeek.indexOf(day)) && (
+              {availabilities.some(a => a.day_of_week === index) && (
                 <CheckCircle className="text-green-500 mt-1" size={16} />
               )}
             </button>
