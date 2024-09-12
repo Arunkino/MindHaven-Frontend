@@ -152,11 +152,16 @@ const checkExistingAvailability = (day, start, end) => {
       console.log("Data being sent to the server:", data);
   
       // Check for overlapping availabilities
-      const overlappingAvailability = availabilities.find(a => 
-        a.day_of_week === selectedDayIndex &&
+      const overlappingAvailability = availabilities.find(a => {
+
+        console.log("Comparing availability:", a);
+        console.log("Day index:", selectedDayIndex);
+        console.log(a.day_of_week+1 === selectedDayIndex)
+        a.day_of_week+1 === selectedDayIndex &&
         ((a.start_time <= startTime && startTime < a.end_time) ||
          (a.start_time < endTime && endTime <= a.end_time) ||
          (startTime <= a.start_time && a.end_time <= endTime))
+        }
       );
   
       if (overlappingAvailability) {
@@ -254,6 +259,7 @@ const checkExistingAvailability = (day, start, end) => {
         {/* Day selection buttons */}
         <div className="grid grid-cols-7 gap-4 mb-8">
           {daysOfWeek.map((day, index) => (
+            index = index === 0?6:index-1,
             <button
               key={day}
               onClick={() => handleDayClick(day)}
@@ -348,7 +354,7 @@ const checkExistingAvailability = (day, start, end) => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {availabilities.map((availability) => (
                 <div key={availability.id} className="bg-white rounded-lg shadow-md p-4">
-                  <h3 className="text-lg font-semibold text-gray-700 mb-2">{daysOfWeek[availability.day_of_week]}</h3>
+                  <h3 className="text-lg font-semibold text-gray-700 mb-2">{daysOfWeek[availability.day_of_week===6?0:availability.day_of_week+1]}</h3>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">
                       <Clock className="text-green-500 mr-2" />

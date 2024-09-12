@@ -14,7 +14,7 @@ let dispatch = null;
 let currentUserId = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
-const RECONNECT_INTERVAL = 5000; // 5 seconds
+const RECONNECT_INTERVAL = 10000; // 5 seconds
 
 const connectWebSocket = () => {
   if (!currentUserId) {

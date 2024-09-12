@@ -32,8 +32,29 @@ const VideoCall = () => {
 
   const [paymentData, setPaymentData] = useState(null);
 
+
+  // for payment sdk loading 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => {
+        resolve(true);
+      };
+      script.onerror = () => {
+        resolve(false);
+      };
+      document.body.appendChild(script);
+    });
+  };
+
   const initiatePayment = async () => {
     try {
+      const isLoaded = await loadRazorpayScript();
+      if (!isLoaded) {
+        toast.error('Failed to load payment gateway. Please try again.');
+        return;
+      }
       const response = await axiosInstance.post(`/api/create-payment/${callId}/`);
       console.log("PAYMENT DATA::", response.data);
       setPaymentData(response.data);
