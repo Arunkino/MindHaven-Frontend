@@ -11,7 +11,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import { ToastContainer, toast } from 'react-toastify';
 import { persistor } from './app/store';
 
-
 function App() {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.user.currentUser);
@@ -66,7 +65,8 @@ function App() {
 
     return () => {
       if (socket) {
-        closeWebSocket();
+        // closeWebSocket();
+        socket.close();
       }
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
