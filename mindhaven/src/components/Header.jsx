@@ -55,7 +55,9 @@ function Header() {
       <nav className="container mx-auto flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold flex items-center">
           <img src={logo} alt="Mind Haven Logo" className="h-8 w-auto mr-2 animate-pulse" />
+
           {/* <span className="hidden sm:inline">Mind Haven</span> */}
+
         </Link>
         
         {/* Mobile menu button */}
