@@ -49,7 +49,14 @@ const UpcomingSessions = () => {
       setLoading(false);
     }
   };
-
+    // New helper function to check if a slot is in the future
+    const isSlotInFuture = (slot) => {
+      const now = new Date();
+      const slotDate = new Date(slot.date);
+      const [hours, minutes] = slot.start_time.split(':').map(Number);
+      slotDate.setHours(hours, minutes);
+      return slotDate > now;
+    };
   const handleBookSession = async () => {
     if (!selectedSlot) return;
     try {
@@ -85,7 +92,8 @@ const UpcomingSessions = () => {
   };
 
   const groupSlotsByDateAndMentor = (slots) => {
-    return slots.reduce((acc, slot) => {
+    const futureSlots = slots.filter(isSlotInFuture);
+    return futureSlots.reduce((acc, slot) => {
       const date = new Date(slot.date).toLocaleDateString('en-GB');
       if (!acc[date]) {
         acc[date] = {};
@@ -140,6 +148,8 @@ const UpcomingSessions = () => {
       });
     }
   };
+
+
 
   const handleSlotHover = (slotId) => {
     setExpandedSlot(slotId);
