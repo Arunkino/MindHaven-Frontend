@@ -14,7 +14,7 @@ let dispatch = null;
 let currentUserId = null;
 let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
-const RECONNECT_INTERVAL = 10000; // 5 seconds
+const RECONNECT_INTERVAL = 5000; // 5 seconds
 
 const connectWebSocket = () => {
   if (!currentUserId) {
@@ -27,8 +27,8 @@ const connectWebSocket = () => {
     toast.error('Unable to connect. Please refresh the page.');
     return;
   }
-
-  const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
+  const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
+  // const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
   socket = new WebSocket(wsUrl);
 
   socket.onopen = () => {
@@ -39,6 +39,12 @@ const connectWebSocket = () => {
 
   socket.onclose = (event) => {
     console.log('WebSocket disconnected');
+    console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
+    if (!event.wasClean && currentUserId) {
+      reconnectAttempts++;
+      console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+      setTimeout(connectWebSocket, RECONNECT_INTERVAL);
+    }
     console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
     if (!event.wasClean && currentUserId) {
       reconnectAttempts++;
@@ -80,6 +86,7 @@ export const setupWebSocket = (dispatchFunction, userId) => {
   }
   return socket;
 };
+
 
 
 const handleVideoCallUpdate = (data) => {
