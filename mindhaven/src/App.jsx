@@ -65,7 +65,8 @@ function App() {
 
     return () => {
       if (socket) {
-        closeWebSocket();
+        // closeWebSocket();
+        socket.close();
       }
       if (reconnectTimeout) {
         clearTimeout(reconnectTimeout);
