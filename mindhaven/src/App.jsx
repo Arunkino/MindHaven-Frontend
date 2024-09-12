@@ -44,6 +44,10 @@ function App() {
         
         socket.onclose = (event) => {
           console.log('WebSocket closed. Attempting to reconnect...');
+          if (!isAuthenticated){
+            consol.log("not logged in");
+            return;
+          }
           if (reconnectAttempts < MAX_RECONNECT_ATTEMPTS) {
             reconnectTimeout = setTimeout(() => {
               setReconnectAttempts(prev => prev + 1);
