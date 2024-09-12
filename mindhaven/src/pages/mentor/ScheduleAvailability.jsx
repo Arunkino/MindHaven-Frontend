@@ -153,16 +153,20 @@ const checkExistingAvailability = (day, start, end) => {
   
       // Check for overlapping availabilities
       const overlappingAvailability = availabilities.find(a => {
-
         console.log("Comparing availability:", a);
         console.log("Day index:", selectedDayIndex);
-        console.log(a.day_of_week+1 === selectedDayIndex)
-        a.day_of_week+1 === selectedDayIndex &&
-        ((a.start_time <= startTime && startTime < a.end_time) ||
-         (a.start_time < endTime && endTime <= a.end_time) ||
-         (startTime <= a.start_time && a.end_time <= endTime))
-        }
-      );
+        const dayMatches = a.day_of_week === (selectedDayIndex === 0? 6 : selectedDayIndex - 1);
+        console.log("Day matches:", dayMatches);
+        
+        const timeOverlaps = (
+          (a.start_time <= startTime && startTime < a.end_time) ||
+          (a.start_time < endTime && endTime <= a.end_time) ||
+          (startTime <= a.start_time && a.end_time <= endTime)
+        );
+        console.log("Time overlaps:", timeOverlaps);
+        
+        return dayMatches && timeOverlaps;
+      });
   
       if (overlappingAvailability) {
         console.log("Overlapping availability found:", overlappingAvailability);
