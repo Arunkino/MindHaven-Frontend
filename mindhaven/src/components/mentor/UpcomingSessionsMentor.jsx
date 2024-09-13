@@ -15,7 +15,7 @@ const UpcomingSessions = () => {
     fetchSessions();
 
       
-    }, 100);
+    }, 50);
     console.log("sessions fetched")
     
 
