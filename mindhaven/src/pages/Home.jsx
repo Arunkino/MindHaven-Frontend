@@ -6,7 +6,7 @@ import  Lottie  from "lottie-react";
 import  animationData from '../assets/Animation1.json'
 
 const images = [
-  { src: '../src/assets/final_vector_mental_health.svg', alt: 'Image 1', caption: 'Finding inner peace is just a step away \nJoin us today' },
+  { src: '../src/assets/signup-img.png', alt: 'Image 1', caption: 'Finding inner peace is just a step away \nJoin us today' },
   { src: '../src/assets/mental_health_01_blue.svg', alt: 'Image 2', caption: 'Your mental well-being matters \nLet\'s walk this path together' },
   { src: '../src/assets/Mental_health_03_720X720.svg', alt: 'Image 3', caption: 'Unlock Your Potential \n We are Here for You' },
 ];
