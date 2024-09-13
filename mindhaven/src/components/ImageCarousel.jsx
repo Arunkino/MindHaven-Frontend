@@ -6,13 +6,13 @@ const ImageCarousel = ({ images }) => {
   useEffect(() => {
     const timer = setInterval(() => {
       setCurrentSlide((prevSlide) => (prevSlide + 1) % images.length);
-    }, 5000); // Change slide every 5 seconds
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [images.length]);
 
   return (
-    <div className="image-carousel-div relative w-full h-3/4 overflow-hidden rounded-lg">
+    <div className="relative w-full h-64 sm:h-80 md:h-96 overflow-hidden rounded-lg">
       {images.map((image, index) => (
         <div
           key={index}
@@ -20,9 +20,9 @@ const ImageCarousel = ({ images }) => {
             index === currentSlide ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <img src={image.src} alt={image.alt} className="object-cover w-full h-full " />
-          <div className="absolute bottom-0 left-0 right-0 p-4 bg-black bg-opacity-50 text-white">
-            <p className="text-xl font-bold text-center whitespace-pre-line ">{image.caption}</p><br />
+          <img src={image.src} alt={image.alt} className="object-cover w-full h-full" />
+          <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 bg-black bg-opacity-50 text-white">
+            <p className="text-sm sm:text-base md:text-lg font-bold text-center whitespace-pre-line">{image.caption}</p>
           </div>
         </div>
       ))}
@@ -30,7 +30,7 @@ const ImageCarousel = ({ images }) => {
         {images.map((_, index) => (
           <button
             key={index}
-            className={`w-3 h-3 rounded-full ${
+            className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
               index === currentSlide ? 'bg-white' : 'bg-gray-400'
             }`}
             onClick={() => setCurrentSlide(index)}
