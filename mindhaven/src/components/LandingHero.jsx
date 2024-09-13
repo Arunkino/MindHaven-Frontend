@@ -1,10 +1,11 @@
-import React from 'react';
-import { ArrowRight } from 'lucide-react';
-import ServiceCard from './ServiceCard';
-import MentorImage from '../assets/Mentor_svg.svg'
-import BuddieImage from '../assets/Buddies_svg.svg'
-import DonateImage from '../assets/Donate_svg.svg'
-import MindfulImage from '../assets/Mindful_svg.svg'
+import React from "react";
+import { ArrowRight } from "lucide-react";
+import ServiceCard from "./ServiceCard";
+import MentorImage from "../assets/Mentor_svg.svg";
+import BuddieImage from "../assets/Buddies_svg.svg";
+import DonateImage from "../assets/Donate_svg.svg";
+import MindfulImage from "../assets/Mindful_svg.svg";
+import { Link, useNavigate } from "react-router-dom";
 
 const MindHavenLanding = () => {
   return (
@@ -28,35 +29,44 @@ const MindHavenLanding = () => {
           {/* Right side */}
           <div className="w-full lg:w-2/3 lg:pl-12">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <ServiceCard
-                title="Free Consultations"
-                description="Get daily thirty minutes free consultations with all Professionals 24x7"
-                imageUrl={MentorImage}
-                titleColor="text-custom-accent"
-                accentColor="bg-yellow-400"
-              />
-              <ServiceCard
-                title="Connect with Buddies"
-                description="Talk and Listen without revealing your Identity"
-                footer="Find Happiness"
-                imageUrl={BuddieImage}
-                titleColor="text-custom-accent"
-                accentColor="bg-yellow-400"
-              />
-              <ServiceCard
-                title="Donate today"
-                description="Help us provide free mental health consultations. Your donation can bring light to someone's darkest days."
-                imageUrl={DonateImage}
-                titleColor="text-custom-accent"
-                accentColor="bg-yellow-400"
-              />
-              <ServiceCard
-                title="Mindful and Stress free"
-                description="Follow the daily activities to be mindful"
-                imageUrl={MindfulImage}
-                titleColor="text-custom-accent"
-                accentColor="bg-yellow-400"
-              />
+              <Link to={"/dashboard"}>
+                <ServiceCard
+                  title="Free Consultations"
+                  description="Get daily thirty minutes free consultations with all Professionals 24x7"
+                  imageUrl={MentorImage}
+                  titleColor="text-custom-accent"
+                  accentColor="bg-yellow-400"
+                />
+              </Link>
+
+              <Link to={"/dashboard"}>
+                <ServiceCard
+                  title="Connect with Buddies"
+                  description="Talk and Listen without revealing your Identity"
+                  footer="Find Happiness"
+                  imageUrl={BuddieImage}
+                  titleColor="text-custom-accent"
+                  accentColor="bg-yellow-400"
+                />
+              </Link>
+              <Link to={"/dashboard"}>
+                <ServiceCard
+                  title="Donate today"
+                  description="Help us provide free mental health consultations. Your donation can bring light to someone's darkest days."
+                  imageUrl={DonateImage}
+                  titleColor="text-custom-accent"
+                  accentColor="bg-yellow-400"
+                />
+              </Link>
+              <Link to={"dashboard"}>
+                <ServiceCard
+                  title="Mindful and Stress free"
+                  description="Follow the daily activities to be mindful"
+                  imageUrl={MindfulImage}
+                  titleColor="text-custom-accent"
+                  accentColor="bg-yellow-400"
+                />
+              </Link>
             </div>
           </div>
         </div>

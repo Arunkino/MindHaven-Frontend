@@ -1,14 +1,15 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import axiosInstance from '../../utils/axiosConfig';
-import { disconnectWebSocket } from '../websocketService';
-
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axiosInstance from "../../utils/axiosConfig";
+import { disconnectWebSocket } from "../websocketService";
 
 export const refreshToken = createAsyncThunk(
-  'user/refreshToken',
+  "user/refreshToken",
   async (_, { getState, rejectWithValue }) => {
     const { refreshToken } = getState().user;
     try {
-      const response = await axiosInstance.post('/api/token/refresh/', { refresh: refreshToken });
+      const response = await axiosInstance.post("/api/token/refresh/", {
+        refresh: refreshToken,
+      });
       console.log("refresh token response", response.data);
       return response.data;
     } catch (error) {
@@ -18,13 +19,13 @@ export const refreshToken = createAsyncThunk(
 );
 
 export const logoutUser = createAsyncThunk(
-  'user/logoutUser',
+  "user/logoutUser",
   async (_, { dispatch }) => {
     try {
       // Perform any logout API call if needed
       // await axiosInstance.post('/api/logout/');
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       // Dispatch the logout action from userSlice
       dispatch(logout());
@@ -37,7 +38,7 @@ export const logoutUser = createAsyncThunk(
 );
 
 const userSlice = createSlice({
-  name: 'user',
+  name: "user",
   initialState: {
     currentUser: null,
     isAuthenticated: false,

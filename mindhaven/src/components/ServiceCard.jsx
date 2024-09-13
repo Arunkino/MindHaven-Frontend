@@ -1,4 +1,4 @@
-const ServiceCard = ({ title, description, footer, imageUrl, titleColor, accentColor }) => {
+const ServiceCard = ({ title, description, footer, imageUrl, titleColor, accentColor, onClick }) => {
     return (
       <div className="service-card bg-white rounded-lg shadow-lg overflow-hidden transform hover:scale-105 transition-transform duration-300">
         <div className="p-6">
