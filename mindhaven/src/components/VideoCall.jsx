@@ -98,7 +98,7 @@ const VideoCall = () => {
         // Handle successful payment (e.g., update UI, redirect)
         setTimeout(() => {
           goToDashboard();
-        }, 3000);
+        }, 2000);
       } else {
         toast.error('Payment failed. Please try again.');
       }
@@ -132,7 +132,7 @@ const VideoCall = () => {
           user_role: currentUser.role,
         },
       });
-    }, 1000);
+    }, 5000);
 
     return () => {
       closeWebSocket();
