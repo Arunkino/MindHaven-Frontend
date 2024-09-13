@@ -10,14 +10,18 @@ const UpcomingSessions = () => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
 
   useEffect(() => {
+    console.log("Component mounted");
+    setTimeout(() => {
     fetchSessions();
-    
-    // Update current date and time every second
-    const timer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
 
-    return () => clearInterval(timer);
+      
+    }, 100);
+    console.log("sessions fetched")
+    
+
+    return () => {
+      
+    }
   }, []);
 
   const fetchSessions = async () => {
@@ -72,10 +76,10 @@ const UpcomingSessions = () => {
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <div className="mb-4 p-4 bg-gray-100 rounded-lg">
+      {/* <div className="mb-4 p-4 bg-gray-100 rounded-lg">
         <h2 className="text-lg font-semibold mb-2">Debug Information</h2>
         <p>Current Date and Time: {currentDateTime.toLocaleString()}</p>
-      </div>
+      </div> */}
       
       {sessions.length === 0 ? (
         <p>No upcoming sessions scheduled.</p>
