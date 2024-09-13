@@ -16,49 +16,66 @@ let reconnectAttempts = 0;
 const MAX_RECONNECT_ATTEMPTS = 5;
 const RECONNECT_INTERVAL = 5000; // 5 seconds
 
-const connectWebSocket = () => {
-  if (!currentUserId) {
-    console.log('No user ID available. Skipping WebSocket connection.');
-    return;
-  }
 
-  if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-    console.error('Max reconnection attempts reached. Please refresh the page.');
-    toast.error('Unable to connect. Please refresh the page.');
-    return;
-  }
-  const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
   // const wsUrl = `ws://127.0.0.1:8000/ws/chat/${currentUserId}/`;
-  socket = new WebSocket(wsUrl);
 
-  socket.onopen = () => {
-    console.log('WebSocket connected');
-    reconnectAttempts = 0;
-    toast.success('Connected to chat server');
-  };
 
-  socket.onclose = (event) => {
-    console.log('WebSocket disconnected');
-    console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
-    if (!event.wasClean && currentUserId) {
-      reconnectAttempts++;
-      console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-      setTimeout(connectWebSocket, RECONNECT_INTERVAL);
-    }
-    console.log('WebSocket closed. Code:', event.code, 'Reason:', event.reason);
-    if (!event.wasClean && currentUserId) {
-      reconnectAttempts++;
-      console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
-      setTimeout(connectWebSocket, RECONNECT_INTERVAL);
-    }
-  };
+// Helper functions (for intervals)
+const getReconnectInterval = () => {
+  return Math.min(1000 * (2 ** reconnectAttempts) + Math.random() * 1000, 30000);
+};
 
-  socket.onerror = (error) => {
-    console.error('WebSocket error:', error);
-    if (currentUserId) {
-      toast.error('Connection error. Trying to reconnect...');
+// Helper functions (for checking online status)
+const isOnline = () => {
+  return navigator.onLine;
+};
+
+  const connectWebSocket = () => {
+    if (!navigator.onLine) {
+      console.log('No network connection. Delaying reconnection attempt.');
+      setTimeout(connectWebSocket, 5000);
+      return;
     }
-  };
+  
+    if (!currentUserId) {
+      console.log('No user ID available. Skipping WebSocket connection.');
+      return;
+    }
+  
+    if (socket && (socket.readyState === WebSocket.CONNECTING || socket.readyState === WebSocket.OPEN)) {
+      console.log('WebSocket is already connecting or connected. Skipping connection attempt.');
+      return;
+    }
+  
+    if (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+      console.error('Max reconnection attempts reached. Please refresh the page.');
+      toast.error('Unable to connect. Please refresh the page.');
+      return;
+    }
+    const wsUrl = `wss://api.mindhaven.site/ws/chat/${currentUserId}/`;
+    
+    socket = new WebSocket(wsUrl);
+  
+    socket.onopen = () => {
+      console.log('WebSocket connected. ReadyState:', socket.readyState);
+      reconnectAttempts = 0;
+      toast.success('Connected to chat server');
+    };
+  
+    socket.onclose = (event) => {
+      console.log('WebSocket disconnected. ReadyState:', socket.readyState);
+      console.log('Close event details:', JSON.stringify(event, Object.getOwnPropertyNames(event)));
+      if (!event.wasClean && currentUserId) {
+        reconnectAttempts++;
+        console.log(`Attempting to reconnect (${reconnectAttempts}/${MAX_RECONNECT_ATTEMPTS})`);
+        setTimeout(connectWebSocket, getReconnectInterval());
+      }
+    };
+  
+    socket.onerror = (error) => {
+      console.error('WebSocket error:', error);
+      console.error('Error details:', JSON.stringify(error, Object.getOwnPropertyNames(error)));
+    };
 
   socket.onmessage = (event) => {
     const data = JSON.parse(event.data);
@@ -79,11 +96,13 @@ const connectWebSocket = () => {
 };
 
 export const setupWebSocket = (dispatchFunction, userId) => {
+  if (!userId) {
+    console.log('No user ID provided. Skipping WebSocket setup.');
+    return null;
+  }
   dispatch = dispatchFunction;
   currentUserId = userId;
-  if (userId) {
-    connectWebSocket();
-  }
+  connectWebSocket();
   return socket;
 };
 
@@ -142,6 +161,10 @@ export const isWebSocketConnected = () => {
 };
 
 export const reconnectWebSocket = () => {
+  if (!currentUserId) {
+    console.log('No user ID available. Skipping reconnection.');
+    return;
+  }
   if (socket) {
     socket.close();
   }
@@ -149,9 +172,15 @@ export const reconnectWebSocket = () => {
   connectWebSocket();
 };
 
+
+
+
+
 export const disconnectWebSocket = () => {
+  console.log('Disconnecting from WebSocket');
   if (socket) {
     socket.close();
+    socket = null;
   }
   currentUserId = null;
   reconnectAttempts = 0;

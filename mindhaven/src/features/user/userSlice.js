@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axiosInstance from '../../utils/axiosConfig';
+import { disconnectWebSocket } from '../websocketService';
 
 
 export const refreshToken = createAsyncThunk(
@@ -60,6 +61,7 @@ const userSlice = createSlice({
       state.accessToken = null;
       state.refreshToken = null;
       state.role = null;
+      disconnectWebSocket();
       // localStorage.removeItem('user');
       // Clear any other storage as needed
       // sessionStorage.clear();
