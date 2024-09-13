@@ -3,10 +3,11 @@ import ImageCarousel from '../components/ImageCarousel';
 import MindHavenLanding from '../components/LandingHero';
 import  Lottie  from "lottie-react";
 // import { Player } from '@lottiefiles/react-lottie-player';
-import  animationData from '../assets/Animation1.json'
+import  animationData from '../assets/Animation1.json';
+import image1 from '../assets/final_vector_mental_health.svg'
 
 const images = [
-  { src: '../src/assets/signup-img.png', alt: 'Image 1', caption: 'Finding inner peace is just a step away \nJoin us today' },
+  { src: image1, alt: 'Image 1', caption: 'Finding inner peace is just a step away \nJoin us today' },
   { src: '../src/assets/mental_health_01_blue.svg', alt: 'Image 2', caption: 'Your mental well-being matters \nLet\'s walk this path together' },
   { src: '../src/assets/Mental_health_03_720X720.svg', alt: 'Image 3', caption: 'Unlock Your Potential \n We are Here for You' },
 ];
