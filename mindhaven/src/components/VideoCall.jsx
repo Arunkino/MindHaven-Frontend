@@ -137,14 +137,14 @@ const VideoCall = () => {
     return () => {
       closeWebSocket();
     };
-  }, [callId, currentUser, dispatch]);
+  }, [callId, currentUser]);
 
   useEffect(() => {
     let interval;
     if (isCallActive) {
       interval = setInterval(() => {
         dispatch(updateCallDuration());
-      }, 1000);
+      }, 3000);
     }
     return () => clearInterval(interval);
   }, [isCallActive, dispatch]);
