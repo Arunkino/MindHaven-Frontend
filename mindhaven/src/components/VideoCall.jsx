@@ -137,7 +137,7 @@ const VideoCall = () => {
     return () => {
       closeWebSocket();
     };
-  }, [callId, currentUser]);
+  }, [callId, currentUser, dispatch]);
 
   useEffect(() => {
     let interval;
