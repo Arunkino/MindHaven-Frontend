@@ -7,6 +7,7 @@ import { fetchNotifications, markNotificationAsRead, clearAllNotifications } fro
 import { Bell, Menu, X } from 'lucide-react';
 import logo from '../assets/logo.svg';
 import Notification from './Notification';
+import { resetCallState } from '../features/videoCall/videoCallSlice';
 
 function Header() {
   const { currentUser, isAuthenticated, role } = useSelector(state => state.user);
@@ -39,6 +40,7 @@ function Header() {
   const handleLogout = () => {
     dispatch(logout());
     dispatch(resetChatState());
+    dispatch(resetCallState());
     navigate('/');
   };
 
