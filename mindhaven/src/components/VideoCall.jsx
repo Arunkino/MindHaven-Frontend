@@ -132,7 +132,7 @@ const VideoCall = () => {
           user_role: currentUser.role,
         },
       });
-    }, 5000);
+    }, 3000);
 
     return () => {
       closeWebSocket();
@@ -144,7 +144,7 @@ const VideoCall = () => {
     if (isCallActive) {
       interval = setInterval(() => {
         dispatch(updateCallDuration());
-      }, 3000);
+      }, 1000);
     }
     return () => clearInterval(interval);
   }, [isCallActive, dispatch]);
