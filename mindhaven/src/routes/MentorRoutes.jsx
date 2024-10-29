@@ -7,6 +7,7 @@ import MentorSignup from '../pages/mentor/MentorSignup';
 import MentorDashboard from '../pages/mentor/MentorDashboard';
 import ProtectedRoute from './ProtectedRoute';
 import ScheduleAvailability from '../pages/mentor/ScheduleAvailability';
+import NotFound from '../components/NotFound';
 
 function MentorRoutes() {
   return (
@@ -22,6 +23,7 @@ function MentorRoutes() {
         </Route>
           
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

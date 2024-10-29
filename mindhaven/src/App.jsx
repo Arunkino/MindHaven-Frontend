@@ -4,19 +4,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import MainRoutes from './routes/MainRoutes';
 import MentorRoutes from './routes/MentorRoutes';
 import AdminRoutes from './routes/AdminRoutes';
+import VideoCallWrapper from './components/VideoCall';
+import NotFound from './components/NotFound';
 import { setupAxiosInterceptors } from './utils/setupAxiosInterceptors';
 import { setupWebSocket, disconnectWebSocket, isWebSocketConnected, reconnectWebSocket } from './features/websocketService';
-import VideoCallWrapper from './components/VideoCall';
 import 'react-toastify/dist/ReactToastify.css';
-import { ToastContainer, toast } from 'react-toastify';
-import { persistor } from './app/store';
+import { ToastContainer } from 'react-toastify';
 
 function App() {
   const dispatch = useDispatch();
   const currentUser = useSelector(state => state.user.currentUser);
   const isAuthenticated = useSelector(state => state.user.isAuthenticated);
-  const [reconnectAttempts, setReconnectAttempts] = useState(0);
-  const MAX_RECONNECT_ATTEMPTS = 5;
 
   useEffect(() => {
     setupAxiosInterceptors();
@@ -49,9 +47,16 @@ function App() {
     <Router>
       <ToastContainer />
       <Routes>
+        {/* Main routes with all its nested routes */}
         <Route path="/*" element={<MainRoutes />} />
+        
+        {/* Mentor routes */}
         <Route path="/mentor/*" element={<MentorRoutes />} />
+        
+        {/* Admin routes */}
         <Route path="/admin/*" element={<AdminRoutes />} />
+        
+        {/* Video call route */}
         <Route path="/video-call/:callId" element={<VideoCallWrapper />} />
       </Routes>
     </Router>

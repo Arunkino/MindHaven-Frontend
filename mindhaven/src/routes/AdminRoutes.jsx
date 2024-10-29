@@ -6,6 +6,7 @@ import Home from '../pages/Home';
 import Login from '../pages/Login';
 import AdminDashboard from '../pages/admin/AdminDashboard'; 
 import ProtectedRoute from './ProtectedRoute';
+import NotFound from '../components/NotFound';
 
 
 function AdminRoutes() {
@@ -19,6 +20,7 @@ function AdminRoutes() {
           <Route path="dashboard" element={<AdminDashboard />} />
         </Route>
       </Route>
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }
