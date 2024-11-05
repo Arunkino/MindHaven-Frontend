@@ -19,7 +19,12 @@ const Header = () => {
   const mobileMenuRef = useRef(null);
   const headerRef = useRef(null);
 
-  // Enhanced click outside detection
+  useEffect(() => {
+    if (isAuthenticated) {
+      dispatch(fetchNotifications());
+    }
+  }, [isAuthenticated, dispatch]);
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       // Check if click is outside both the menu button and menu content
@@ -34,46 +39,23 @@ const Header = () => {
         setShowMobileMenu(false);
       }
 
-      // Handle notifications panel
       if (notificationRef.current && !notificationRef.current.contains(event.target)) {
         setShowNotifications(false);
       }
     };
 
-    // Handle escape key
-    const handleEscKey = (event) => {
-      if (event.key === 'Escape') {
-        setShowMobileMenu(false);
-        setShowNotifications(false);
-      }
-    };
-
-    // Handle scroll lock
-    if (showMobileMenu) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscKey);
-    
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscKey);
-      document.body.style.overflow = 'unset';
-    };
-  }, [showMobileMenu]);
-
-  // Handle route changes
-  useEffect(() => {
     const handleRouteChange = () => {
       setShowMobileMenu(false);
       setShowNotifications(false);
     };
 
+    document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('popstate', handleRouteChange);
-    return () => window.removeEventListener('popstate', handleRouteChange);
+    
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      window.removeEventListener('popstate', handleRouteChange);
+    };
   }, []);
 
   const handleLogout = () => {
@@ -82,6 +64,14 @@ const Header = () => {
     dispatch(resetChatState());
     dispatch(resetCallState());
     navigate('/');
+  };
+
+  const handleClearAll = () => {
+    dispatch(clearAllNotifications());
+  };
+
+  const handleMarkAsRead = (notificationId) => {
+    dispatch(markNotificationAsRead(notificationId));
   };
 
   return (
@@ -115,7 +105,72 @@ const Header = () => {
 
             {/* Desktop menu */}
             <ul className="hidden sm:flex items-center space-x-6">
-              {/* ... (desktop menu items remain unchanged) ... */}
+              {isAuthenticated && (
+                <>
+                  <li className="text-custom-text text-lg hover:text-custom-accent transition-colors">
+                    <Link to='dashboard'>
+                      Hi, {currentUser.role === 'admin' ? 'Admin' : currentUser.first_name}
+                    </Link>
+                  </li>
+                  <li className="relative" ref={notificationRef}>
+                    <button
+                      onClick={() => setShowNotifications(!showNotifications)}
+                      className="p-2 hover:bg-white/10 rounded-full transition-colors"
+                    >
+                      <Bell />
+                      {notifications.length > 0 && (
+                        <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
+                          {notifications.length}
+                        </span>
+                      )}
+                    </button>
+                    {showNotifications && (
+                      <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl overflow-hidden">
+                        <div className="py-2">
+                          <div className="flex justify-between items-center px-4 py-2 bg-gray-100">
+                            <h3 className="text-lg font-semibold text-gray-800">Notifications</h3>
+                            <button
+                              onClick={handleClearAll}
+                              className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                            >
+                              Clear All
+                            </button>
+                          </div>
+                          <div className="max-h-96 overflow-y-auto">
+                            {notifications.length === 0 ? (
+                              <p className="px-4 py-3 text-sm text-gray-500">No new notifications</p>
+                            ) : (
+                              <ul>
+                                {notifications.map(notification => (
+                                  <Notification 
+                                    key={notification.id}
+                                    notification={notification}
+                                    onMarkAsRead={handleMarkAsRead}
+                                  />
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </li>
+                </>
+              )}
+              <li><Link to="" className="hover:text-custom-accent transition-colors">Home</Link></li>
+              {isAuthenticated ? (
+                <li><button onClick={handleLogout} className="hover:text-custom-accent transition-colors">Logout</button></li>
+              ) : (
+                <>
+                  <li><Link to="/login" className="hover:text-custom-accent transition-colors">Login</Link></li>
+                  <li><Link to="/mentor" className="hover:text-custom-accent transition-colors">Are You a Mentor?</Link></li>
+                  <li>
+                    <Link to="/signup" className="bg-white text-custom-bg px-4 py-2 rounded-full hover:bg-custom-accent hover:text-white transition-colors">
+                      Sign Up
+                    </Link>
+                  </li>
+                </>
+              )}
             </ul>
           </div>
 
